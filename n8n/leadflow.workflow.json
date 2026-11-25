@@ -1,0 +1,275 @@
+{
+  "name": "LeadFlow: signal to HubSpot",
+  "nodes": [
+    {
+      "id": "n0",
+      "name": "Setup notes",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -260,
+        -120
+      ],
+      "parameters": {
+        "content": "LeadFlow: signal -> engine -> HubSpot\n\nSETUP\n1. Run the engine (docker compose up, or: uvicorn leadflow.api:app). In 'LeadFlow Engine' set the URL (http://leadflow:8000/process in docker compose, http://localhost:8000/process if n8n runs on the host) and the X-API-Key.\n2. In HubSpot create 3 contact properties: leadflow_score (number), leadflow_tier (text), leadflow_owner (text). Connect a HubSpot app-token credential.\n3. Google Sheets: make a sheet with a tab named 'errors' and headers row, company, domain, stage, code, message, logged_at. Put its ID in 'Log Errors to Sheet' and connect Google credentials.\n4. Slack node is disabled by default. Enable and pick a channel if you want the summary.\n\nTEST: click 'Listen for test event' on the Webhook, then POST n8n/test_payload.json to /webhook-test/leadflow.",
+        "height": 520,
+        "width": 420
+      }
+    },
+    {
+      "id": "n1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        260,
+        200
+      ],
+      "webhookId": "leadflow-intake",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "leadflow",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "n2",
+      "name": "LeadFlow Engine",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        500,
+        200
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://leadflow:8000/process",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "change-me"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ leads: $json.body.leads, existing_domains: $json.body.existing_domains || [] }) }}",
+        "options": {
+          "timeout": 120000
+        }
+      }
+    },
+    {
+      "id": "n3",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        780,
+        20
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.stats }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "n4",
+      "name": "Split Processed Leads",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        780,
+        200
+      ],
+      "parameters": {
+        "fieldToSplitOut": "processed",
+        "options": {}
+      }
+    },
+    {
+      "id": "n5",
+      "name": "HubSpot Upsert Contact",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        200
+      ],
+      "parameters": {
+        "authentication": "appToken",
+        "resource": "contact",
+        "operation": "upsert",
+        "email": "={{ $json.email }}",
+        "additionalFields": {
+          "firstName": "={{ $json.first_name }}",
+          "lastName": "={{ $json.last_name }}",
+          "companyName": "={{ $json.company }}",
+          "jobTitle": "={{ $json.contact_title }}",
+          "websiteUrl": "={{ 'https://' + $json.domain }}",
+          "customPropertiesUi": {
+            "customPropertiesValues": [
+              {
+                "property": "leadflow_score",
+                "value": "={{ $json.score }}"
+              },
+              {
+                "property": "leadflow_tier",
+                "value": "={{ $json.tier }}"
+              },
+              {
+                "property": "leadflow_owner",
+                "value": "={{ $json.owner }}"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "n6",
+      "name": "Split Errors",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        780,
+        400
+      ],
+      "parameters": {
+        "fieldToSplitOut": "errors",
+        "options": {}
+      }
+    },
+    {
+      "id": "n7",
+      "name": "Log Errors to Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1040,
+        400
+      ],
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_GOOGLE_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "errors"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row": "={{ $json.row }}",
+            "company": "={{ $json.company }}",
+            "domain": "={{ $json.domain }}",
+            "stage": "={{ $json.stage }}",
+            "code": "={{ $json.code }}",
+            "message": "={{ $json.message }}",
+            "logged_at": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "n8",
+      "name": "Slack Summary",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        780,
+        600
+      ],
+      "disabled": true,
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "#leadflow"
+        },
+        "text": "={{ 'LeadFlow: ' + $json.stats.processed + '/' + $json.stats.total_rows + ' leads processed (' + $json.stats.success_rate_pct + '%). Tiers: ' + JSON.stringify($json.stats.tiers) + '. Errors: ' + JSON.stringify($json.stats.errors_by_code) }}",
+        "otherOptions": {}
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "LeadFlow Engine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LeadFlow Engine": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Split Processed Leads",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Split Errors",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Slack Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Processed Leads": {
+      "main": [
+        [
+          {
+            "node": "HubSpot Upsert Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Errors": {
+      "main": [
+        [
+          {
+            "node": "Log Errors to Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

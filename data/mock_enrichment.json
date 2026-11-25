@@ -1,0 +1,9 @@
+{
+  "brewline.in":     {"industry": "ecommerce", "employees": 25, "signals": ["ecommerce", "hiring"], "description": "Small-batch coffee, sold online"},
+  "kitchenkart.com": {"industry": "ecommerce", "employees": 45, "signals": ["ecommerce", "pricing_page"], "description": "Kitchenware marketplace"},
+  "pixelpantry.io":  {"industry": "saas", "employees": 12, "signals": ["pricing_page"], "description": "Recipe app for teams"},
+  "flaky.example":   {"_flaky": true, "industry": "saas", "employees": 60, "signals": ["hiring", "pricing_page"], "description": "Flaky Labs platform"},
+  "megabank.com":    {"industry": "fintech", "employees": 5000, "signals": [], "description": "Retail bank"},
+  "tinystudio.in":   {"industry": "marketing", "employees": 3, "signals": [], "description": "Design studio"},
+  "adloop.co":       {"industry": "marketing", "employees": 90, "signals": ["hiring", "pricing_page"], "description": "Ad automation"}
+}

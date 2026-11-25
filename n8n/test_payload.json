@@ -1,0 +1,125 @@
+{
+  "leads": [
+    {
+      "company": "Brewline Coffee",
+      "domain": "https://www.brewline.in",
+      "contact_name": "Asha Rao",
+      "contact_title": "Founder",
+      "email": "asha@brewline.in",
+      "industry": "ecommerce",
+      "employees": "25"
+    },
+    {
+      "company": "Kitchenkart",
+      "domain": "kitchenkart.com",
+      "contact_name": "Rohan Mehta",
+      "contact_title": "Head of Growth",
+      "email": "rohan@kitchenkart.com",
+      "industry": "",
+      "employees": ""
+    },
+    {
+      "company": "Pixel Pantry",
+      "domain": "pixelpantry.io",
+      "contact_name": "Sana Iyer",
+      "contact_title": "Marketing Manager",
+      "email": "sana@gmail.com",
+      "industry": "saas",
+      "employees": "12"
+    },
+    {
+      "company": "Brewline Duplicate",
+      "domain": "brewline.in",
+      "contact_name": "Asha Rao",
+      "contact_title": "Founder",
+      "email": "asha@brewline.in",
+      "industry": "ecommerce",
+      "employees": "25"
+    },
+    {
+      "company": "No Domain Ltd",
+      "domain": "",
+      "contact_name": "Vik Shah",
+      "contact_title": "CEO",
+      "email": "vik@nodomain.com",
+      "industry": "retail",
+      "employees": "40"
+    },
+    {
+      "company": "Bad Email Inc",
+      "domain": "bademail.com",
+      "contact_name": "Tara Nair",
+      "contact_title": "CEO",
+      "email": "not-an-email",
+      "industry": "saas",
+      "employees": "30"
+    },
+    {
+      "company": "Flaky Labs",
+      "domain": "flaky.example",
+      "contact_name": "Dev Patel",
+      "contact_title": "CTO",
+      "email": "dev@flaky.example",
+      "industry": "saas",
+      "employees": "60"
+    },
+    {
+      "company": "Ghost Corp",
+      "domain": "ghostcorp.xyz",
+      "contact_name": "Mia Roy",
+      "contact_title": "Owner",
+      "email": "mia@ghostcorp.xyz",
+      "industry": "retail",
+      "employees": "15"
+    },
+    {
+      "company": "Existing Co",
+      "domain": "existing.com",
+      "contact_name": "Lee Wong",
+      "contact_title": "Director",
+      "email": "lee@existing.com",
+      "industry": "saas",
+      "employees": "80"
+    },
+    {
+      "company": "MegaBank",
+      "domain": "megabank.com",
+      "contact_name": "Priya Das",
+      "contact_title": "Director of Ops",
+      "email": "priya@megabank.com",
+      "industry": "fintech",
+      "employees": "5000"
+    },
+    {
+      "company": "Tiny Studio",
+      "domain": "tinystudio.in",
+      "contact_name": "Jay Kapoor",
+      "contact_title": "Owner",
+      "email": "jay@tinystudio.in",
+      "industry": "marketing",
+      "employees": "3"
+    },
+    {
+      "company": "Adloop",
+      "domain": "adloop.co",
+      "contact_name": "Neha Bose",
+      "contact_title": "VP Marketing",
+      "email": "neha@mailer.adloop.co",
+      "industry": "marketing",
+      "employees": "90"
+    },
+    {
+      "company": "Salty Bad Domain",
+      "domain": "not a domain",
+      "contact_name": "Om Jain",
+      "contact_title": "Founder",
+      "email": "om@salty.com",
+      "industry": "retail",
+      "employees": "10"
+    }
+  ],
+  "existing_domains": [
+    "existing.com",
+    "oldclient.in"
+  ]
+}
