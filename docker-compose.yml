@@ -1,0 +1,8 @@
+# Local run of the engine. Replace change-me with your own secret; never commit a real key.
+services:
+  leadflow:
+    build: .
+    environment:
+      - LEADFLOW_API_KEY=change-me
+      - LEADFLOW_PROVIDER=mock   # "website" enriches from real homepages
+    ports: ["8000:8000"]
